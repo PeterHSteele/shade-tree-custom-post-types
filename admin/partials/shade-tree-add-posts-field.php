@@ -1,0 +1,2 @@
+<p class="description"><?php esc_html_e('You can add multiple post types separated by commas.', $this->textdomain ) ?></p>
+<input id="add-post-type-input" type="text" value="" name="shade-tree-settings[]">

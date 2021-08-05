@@ -1,0 +1,23 @@
+/**
+ * All of the CSS for your admin-specific functionality should be
+ * included in this file.
+ */
+
+#cpt-admin-page{
+  padding: 1rem 1rem 1rem 0;
+}
+
+ul{
+  list-style: disc;
+  padding: 20px;
+}
+
+form{
+  background: #fff;
+  padding: 1rem;
+  border-radius: 6px;
+}
+
+form > div{
+  padding: 1rem 0;
+}
