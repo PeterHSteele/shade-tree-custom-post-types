@@ -46,7 +46,7 @@
         ?></p>
       <input required id="post-type-key-input" type="text" value="" name="edit-post-types[key]">
     </div>
-    <input type="submit" value="Create Post Type">
+    <input type="submit" value=<?php esc_attr_e( "Create Post Type", $this->textdomain) ?>>
   </form>
   <h2><?php esc_html_e('Delete a Post Type', $this->textdomain) ?></h2>
   <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' )) ?>">
@@ -56,5 +56,10 @@
       <label for="type-to-delete-input"><?php esc_html_e('Post Type Key') ?></label>
       <input id="type-to-delete-input" type="text" value="" name="delete-type[key]">
     </div>
+    <div class="field">
+      <label for=deep-delete><?php esc_html_e( 'Delete all posts belonging to this post type', $this->textdomain) ?></label>
+      <input type="checkbox" id="deep-delete" name="deep-delete" value="is-deep-delete">
+    </div>
+    <input type="submit" value="<?php esc_attr_e("Delete Post Type", $this->textdomain) ?>">
   </form>
 </div>

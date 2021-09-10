@@ -184,6 +184,12 @@ class Shade_Tree_CPT_Admin {
 		require_once plugin_dir_path( __FILE__ ) . 'partials/shade-tree-cpt-admin-display.php';
 	}
 
+	/*public function register_query_vars( $vars ){
+		$vars[]='stcpt_deleted';
+		var_dump( 'stcpt deleted is in query vars: ' . in_array( 'stcpt_deleted', $vars ));	
+		return $vars;
+	}*/
+
 	public function handle_delete_post_type(){
 		/* Check the nonce and user privileges */
 		if ( !isset($_POST['shade_tree_delete_type']) || !wp_verify_nonce( $_POST['shade_tree_delete_type'], 'Shade Tree delete post type') ){
@@ -196,28 +202,83 @@ class Shade_Tree_CPT_Admin {
 
 		//get the key of the post type to delete from user input
 		$key_to_delete = $_POST['delete-type']['key'];
-		var_dump('key to delete: ' . $key_to_delete );
 		//get the registered custom post types
 		$post_types = get_option( 'shade-tree-cpt-post-types', array());
+
+		//plugin page url. Redirect here when done deleting.
+		$url = admin_url( 'admin.php?page=shade-tree-cpt-admin-page' );
 		
 		//if the user's type is registered, delete it
 		if ( isset( $post_types[$key_to_delete] ) ){
+			//check for deep delete
+			if ( isset($_POST['deep-delete'])){
+				$rows_deleted = $this->handle_deep_delete( $key_to_delete );
 
+				//add number db records to url so we can generate a notice
+				$url = add_query_arg( 'stcpt_deleted', $rows_deleted, $url );
+			}
+			
 			unregister_post_type( $key_to_delete );
-
+			
+			//remove from list of post types registered by this plugin
 			unset($post_types[$key_to_delete]);
+
+			//add deleted type to $url generate a notice
+			$url = add_query_arg( 'stcpt_deleted_type', $key_to_delete, $url );
+
 		}
 
 		//update wp_options
 		update_option('shade-tree-cpt-post-types', $post_types );
-
-		//redirect user to plugin page
-		$url = admin_url( /*'shade-tree-cpt-admin-page'*/ );
+		
+		//if it's a deep delete, pass number of deleted rows to the plugin page as a query arg so we can generate a notice
 		wp_redirect( $url );
 	}
 
-	public function show_notice(){
+	public function handle_deep_delete( $post_type_key ){
+		global $wpdb;
 
+		$query = "DELETE a,b,c
+    FROM {$wpdb->posts} a
+    LEFT JOIN {$wpdb->term_relationships} b
+        ON (a.ID = b.object_id)
+    LEFT JOIN {$wpdb->postmeta} c
+        ON (a.ID = c.post_id)
+    WHERE a.post_type = %s;";
+		
+		$sql = $wpdb->prepare( $query, $post_type_key );
+		return $wpdb->query( $sql );
+		
+	}
+
+	public function show_notice(){
+		if ( 
+			! isset($_REQUEST['stcpt_deleted_type']) ||
+			'toplevel_page_shade-tree-cpt-admin-page' != get_current_screen()->id 
+		){ 
+			return; 
+		}
+
+		?>
+		<div class="notice notice-success">
+			<?php
+			if ( isset($_REQUEST['stcpt_deleted']) ){ 
+				printf( 
+					/* translators: %1$s: Number of deleted posts. %2$s: number of deleted database records */
+					__( 'Removed %1$s post type and %2$s related records.', $this->textdomain ), 
+					'<span style="font-weight: bold;">' . esc_html( $_REQUEST[ 'stcpt_deleted_type' ] ) . '</span>',
+					esc_html( $_REQUEST[ 'stcpt_deleted'])
+				);
+			} else {
+				printf( 
+					/* translators: %1$s: Number of deleted posts. */
+					__( 'Removed %1$s posts type.', $this->textdomain ), 
+					'<span style="font-weight: bold;">' . esc_html( $_REQUEST[ 'stcpt_deleted_type' ] ) . '</span>'
+				);
+			} 
+			?>
+		</div>
+		<?php 
 	}
 
 	public function handle_edit_post_types_submission(){

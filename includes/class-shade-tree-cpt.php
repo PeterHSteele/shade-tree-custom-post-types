@@ -160,6 +160,8 @@ class Shade_Tree_CPT {
 		$this->loader->add_action( 'init', $plugin_admin, 'register_types' );
 		$this->loader->add_action( 'admin_post_edit_post_types', $plugin_admin, 'handle_edit_post_types_submission');
 		$this->loader->add_action( 'admin_post_delete_post_type', $plugin_admin, 'handle_delete_post_type' );
+		$this->loader->add_action( 'admin_notices', $plugin_admin, 'show_notice' );
+		//$this->loader->add_filter( 'query_vars', $plugin_admin, 'register_query_vars' ); 
 		
 		//$this->loader->add_action( 'admin_menu', $plugin_admin, 'register_settings_page' );
 		//$this->loader->add_action('admin_init', $plugin_admin, 'settings_init');

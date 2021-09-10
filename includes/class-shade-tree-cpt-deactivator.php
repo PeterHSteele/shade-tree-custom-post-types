@@ -32,17 +32,17 @@ class Shade_Tree_CPT_Deactivator {
 	public static function deactivate() {
 		global $wpdb;
 
-		$sql_episode = $wpdb->prepare( gen_query(), 'episode' );
-		$sql_drama = $wpdb->prepare( gen_query(), 'drama');
+		$sql_episode = $wpdb->prepare( self::gen_query(), 'episodes' );
+		//$sql_drama = $wpdb->prepare( gen_query(), 'drama');
 		//var_dump($sql_episode);
 
 		$episodes_rows_deleted = $wpdb->query( $sql_episode );
-		$drama_rows_deleted = $wpdb->query( $sql_drama );
+		//$drama_rows_deleted = $wpdb->query( $sql_drama );
 
-		unregister_post_type( 'Drama' );
-		unregister_post_type( 'Episode' );
+		//unregister_post_type( 'Drama' );
+		unregister_post_type( 'episodes' );
 
-		//print_r('episode rows deleted:' . $episodes_rows_deleted . '. Drama rows deleted: ' . $drama_rows_deleted);
+		var_dump('episode rows deleted:' . $episodes_rows_deleted);
 	}
 
 	public static function gen_query(){
