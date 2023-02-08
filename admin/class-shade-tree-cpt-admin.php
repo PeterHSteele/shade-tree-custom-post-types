@@ -282,6 +282,7 @@ class Shade_Tree_CPT_Admin {
 	}
 
   public function success_notice(){
+    /* prints success notice when post is added */
     if ( 
       !isset( $_REQUEST[ 'stcpt_added' ] ) ||
       'toplevel_page_shade-tree-cpt-admin-page' != get_current_screen()->id 
