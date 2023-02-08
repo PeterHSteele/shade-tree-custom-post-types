@@ -281,6 +281,27 @@ class Shade_Tree_CPT_Admin {
 		<?php 
 	}
 
+  public function success_notice(){
+    if ( 
+      !isset( $_REQUEST[ 'stcpt_added' ] ) ||
+      'toplevel_page_shade-tree-cpt-admin-page' != get_current_screen()->id 
+    ) {
+      return;
+    }
+
+    ?>
+    <div class="notice notice-success">
+      <?php 
+        printf(
+          /* translators: %1$s: name of post type */
+          __( 'Successfully added %1$s post type', $this->textdomain ),
+          '<span style="font-weight: bold;">' . $_REQUEST[ 'stcpt_added' ] . '</span>'
+        )
+      ?>
+    </div>
+    <?php
+  }
+
 	public function handle_edit_post_types_submission(){
 		if (! isset($_POST['ringo_starr']) || ! wp_verify_nonce($_POST['ringo_starr'], 'edit custom post types') ){
 			wp_die(esc_html__('nonce invalid', $this->$textdomain));
@@ -308,13 +329,19 @@ class Shade_Tree_CPT_Admin {
 		/* get already added post types from database */
 		$post_types=get_option('shade-tree-cpt-post-types', array());
 
+    /* url for main plugin page. Will redirect here after db update */
+    $url = admin_url( 'admin.php?page=shade-tree-cpt-admin-page' );
+
 		/* make sure the post type user wants to register isn't aready registered */
 		if ( !isset($post_types[$key]) ){
 			$post_types[$key]=$sanitized['data'];
 			update_option('shade-tree-cpt-post-types',  $post_types);
+      
+      /* add post type to query string so we can create a success notice */
+      $url = add_query_arg( 'stcpt_added', $sanitized['data']['name'], $url );
 		}
 
-		wp_redirect(admin_url());
+		wp_redirect( $url );
 	}
 
 	public function sanitize_post_types( $data ){
